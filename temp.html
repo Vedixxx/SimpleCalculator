@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Calculator</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            background-color: black;
+            color: turquoise;
+            text-align: center;
+            margin-top: 50px;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+        }
+        h1 {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #00f;
+        }
+        input, button {
+            padding: 10px 15px;
+            border: 2px solid turquoise;
+            margin: 5px;
+        }
+        button {
+            color: purple;
+            background-color: turquoise;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        function App() {
+            const [n1, setN1] = React.useState("");
+            const [n2, setN2] = React.useState("");
+            const [op, setOP] = React.useState("");
+            const [error, setERROR] = React.useState("");
+            const [res, setRES] = React.useState(null);
+
+            const calc = async () => {
+                setERROR("");
+                setRES(null);
+
+                try {
+                    const response = await axios.post("http://127.0.0.1:5000/api/calc", { n1, op, n2 });
+                    setRES(response.data);
+                } catch (err) {
+                    setERROR("INVALID INPUT!!!");
+                }
+            };
+
+            return (
+                <div>
+                    <h1>SIMPLE CALCULATOR</h1>
+                    <input type="text" placeholder="Enter the FIRST number..." value={n1} onChange={(e) => setN1(e.target.value)} />
+                    <br />
+                    <input type="text" placeholder="Enter the OPERATOR..." value={op} onChange={(e) => setOP(e.target.value)} />
+                    <br />
+                    <input type="text" placeholder="Enter the SECOND number..." value={n2} onChange={(e) => setN2(e.target.value)} />
+                    <br />
+                    <button onClick={calc}>Calculate...</button>
+                    <br />
+                    {error && <p className="error">{error}</p>}
+                    {res && (
+                        <h2 style={{ padding: "10px 15px", border: "2px solid turquoise" }}>RESULT: {res}</h2>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+</html>
